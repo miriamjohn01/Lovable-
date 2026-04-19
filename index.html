@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Lovable × Revolut</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#080810;color:#fff;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+nav{display:flex;gap:4px;padding:10px 16px;background:#0a0a14;border-bottom:1px solid #1a1a2e;overflow-x:auto;flex-shrink:0;align-items:center}
+nav::-webkit-scrollbar{height:3px}nav::-webkit-scrollbar-thumb{background:#333}
+.nav-btn{padding:5px 13px;border-radius:6px;border:none;cursor:pointer;font-size:12px;font-weight:600;white-space:nowrap;transition:all .2s}
+.nav-btn.active{background:#FF5C28;color:#fff}
+.nav-btn:not(.active){background:#1a1a2e;color:#666}
+.nav-btn:not(.active):hover{color:#aaa}
+.pager{margin-left:auto;display:flex;gap:8px;align-items:center;flex-shrink:0}
+.pg-btn{padding:5px 12px;border-radius:6px;border:1px solid #333;background:transparent;color:#aaa;cursor:pointer;font-size:12px}
+.pg-btn:disabled{color:#333;cursor:default}
+.pg-label{color:#555;font-size:12px}
+#stage{flex:1;overflow:hidden;position:relative}
+.slide{display:none;height:100%;overflow-y:auto;padding:36px 50px;flex-direction:column}
+.slide.active{display:flex}
+.slide::-webkit-scrollbar{width:4px}
+.slide::-webkit-scrollbar-thumb{background:#222}
+
+/* reusable */
+.chip{display:inline-block;padding:3px 10px;border-radius:6px;font-size:10px;font-weight:700;letter-spacing:.5px}
+.label{font-size:13px;font-weight:700;letter-spacing:2px;margin-bottom:8px}
+h2{font-size:26px;font-weight:800;margin-bottom:6px}
+.sub{color:#777;font-size:13px;margin-bottom:24px}
+.card{border-radius:14px;padding:20px 24px}
+.row{display:flex;gap:12px;align-items:flex-start;margin-bottom:10px}
+.tag-pill{min-width:120px;border-radius:6px;padding:3px 8px;font-size:10px;font-weight:700;text-align:center;margin-top:3px;flex-shrink:0}
+textarea{width:100%;background:#ffffff08;border:1px solid #ffffff15;border-radius:8px;padding:8px 12px;color:#ddd;font-size:12px;font-family:inherit;resize:none;margin-top:6px;line-height:1.5}
+textarea:focus{outline:none;border-color:#FF5C2855}
+textarea::placeholder{color:#444}
+.impact-badge{display:inline-block;background:#FF5C2820;border:1px solid #FF5C2855;border-radius:6px;padding:4px 10px;font-size:11px;color:#FF8C42;font-weight:600;margin-top:6px}
+
+/* slide-specific bg colors applied inline */
+</style>
+</head>
+<body>
+
+<nav id="nav"></nav>
+<div id="stage"></div>
+
+<script>
+// ── state ──────────────────────────────────────────────
+const answers = {pain:"",metrics:"",design:"",buyer:"",process:"",scale:""};
+
+const questions = [
+  {key:"pain",  tag:"PAIN",           color:"#FF5C28", q:"When you say 'prototype faster' — is the friction the time, the engineering dependency, or what survives the handoff to dev?", ph:"e.g. Engineers are fast but the review cycles kill us — 3 rounds before anything is signed off..."},
+  {key:"metrics",tag:"METRICS",       color:"#FF8C42", q:"Across mortgages, AI assistant, Revolut X, ATMs — what does a 2-week prototype delay actually cost at your scale?", ph:"e.g. Every delayed decision pushes our sprint by 1 week across 4 product lines simultaneously..."},
+  {key:"design", tag:"DESIGN (Maria)",color:"#FFB347", q:"How much of the original design intent survives when your team hands off to engineering today?", ph:"e.g. We lose a lot in translation — devs interpret Figma differently and we spend time re-aligning..."},
+  {key:"buyer",  tag:"ECONOMIC BUYER",color:"#66d9e8", q:"Is this a CPO-level call, or does tooling at this scope involve your CTO or CFO?", ph:"e.g. CPO owns it but anything above £50k goes to CFO for sign-off..."},
+  {key:"process",tag:"PROCESS",       color:"#74c0fc", q:"How does a net-new vendor evaluation move at Revolut — given your regulatory environment?", ph:"e.g. Security review takes 4-6 weeks, then legal, then procurement — typical 3 month cycle..."},
+  {key:"scale",  tag:"SCALE",         color:"#b197fc", q:"150 users — is that one division piloting, or a proof point for the broader PDE org of 2,400+?", ph:"e.g. Pilot across product design team, but intent is to roll out to all product managers if it works..."},
+];
+
+// ── slides definition ───────────────────────────────────
+function slideIntro(){
+  return `
+  <div style="background:linear-gradient(135deg,#0f0f1a,#1a1a2e,#0d1b2a);height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px">
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:28px">
+      <div style="background:#FF5C28;border-radius:12px;padding:10px 22px;font-weight:900;font-size:22px;letter-spacing:1px">Lovable</div>
+      <div style="color:#444;font-size:28px">×</div>
+      <div style="background:#191C1F;border:1.5px solid #333;border-radius:12px;padding:10px 22px;font-weight:900;font-size:22px">Revolut</div>
+    </div>
+    <h1 style="font-size:34px;font-weight:800;text-align:center;margin-bottom:10px">Building at the Speed<br/>of Decision</h1>
+    <p style="color:#888;font-size:15px;text-align:center;margin-bottom:40px;line-height:1.7">A conversation about what's possible when product teams<br/>stop waiting for engineering.</p>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;justify-content:center">
+      ${["Dmitry Zokalov — CPO","Maria Herrera — Head of Product Design"].map(n=>`<div style="background:#ffffff0f;border:1px solid #ffffff18;border-radius:10px;padding:10px 22px;font-size:13px;color:#ccc">${n}</div>`).join("")}
+    </div>
+    <div style="position:absolute;bottom:24px;color:#333;font-size:12px">30 minutes · Inbound Discovery · Confidential</div>
+  </div>`;
+}
+
+function slideAgenda(){
+  const items=[
+    {t:"0–2 min","title":"Introductions","desc":"Context on each side — what brought you here, what we've prepared specifically for Revolut.","c":"#FF5C28"},
+    {t:"2–4 min","title":"One Observation","desc":"A hypothesis on where the real bottleneck lives for a product org at your scale. Tell me if I'm wrong.","c":"#FF8C42"},
+    {t:"4–11 min","title":"Your World","desc":"Focused questions — I want to understand the friction, not assume it. No boilerplate discovery.","c":"#FFB347"},
+    {t:"11–14 min","title":"Something Built","desc":"I'll show you what I built this morning specific to Revolut. Optionally, we build something live.","c":"#66d9e8"},
+    {t:"14–16 min","title":"Honest Fit Conversation","desc":"Why anything, why Lovable, why now — and whether this is worth a deeper session.","c":"#74c0fc"},
+  ];
+  return `<div style="background:#0f0f1a;min-height:100%">
+    <div class="label" style="color:#FF5C28">OUR 30 MINUTES TOGETHER</div>
+    <h2>What to Expect</h2><div class="sub">Co-own this with me — add or adjust anything.</div>
+    ${items.map(s=>`<div class="row" style="margin-bottom:18px">
+      <div style="min-width:68px;color:${s.c};font-weight:700;font-size:12px;padding-top:2px">${s.t}</div>
+      <div style="width:3px;background:${s.c};border-radius:3px;min-height:44px;margin-top:2px;flex-shrink:0"></div>
+      <div><div style="font-weight:700;font-size:14px;margin-bottom:3px">${s.title}</div><div style="color:#888;font-size:13px">${s.desc}</div></div>
+    </div>`).join("")}
+    <div style="background:#ffffff0a;border:1px solid #ffffff10;border-radius:10px;padding:13px 18px;font-size:13px;color:#888;margin-top:8px">
+      🎯 Goal: You leave knowing whether Lovable can fundamentally change how your product team moves.
+    </div>
+  </div>`;
+}
+
+function slideHypothesis(){
+  return `<div style="background:#0f0f1a;min-height:100%">
+    <div class="label" style="color:#FF5C28">PRESSURE TEST THIS</div>
+    <h2>My Hypothesis on Revolut's Real Problem</h2>
+    <div class="sub">Tell me where I'm wrong — that's more valuable than agreeing.</div>
+    <div class="card" style="background:linear-gradient(135deg,#1e1e2e,#252538);border:1.5px solid #FF5C2840;margin-bottom:20px">
+      <div style="color:#FF5C28;font-weight:700;margin-bottom:10px;font-size:13px">THE HYPOTHESIS</div>
+      <p style="font-size:16px;line-height:1.75;color:#e0e0e0">Revolut's product org has solved the <em>tooling</em> problem — Figma for design, Claude for intelligence, strong in-house engineering. What it hasn't solved is <strong style="color:#FF8C42">decision latency</strong> — the gap between "we have an idea" and "a stakeholder can react to something real."</p>
+      <p style="font-size:16px;line-height:1.75;color:#e0e0e0;margin-top:10px">Across 5 concurrent product lines, 30+ markets, and a race to 100M customers — that gap compounds. Fast.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px">
+      ${[["📊","Evidence","Hiring slowed in 2024 despite record growth. AI cited — fewer people must move faster."],
+         ["📡","Signal","150 users, 6–12mo timeline. This isn't a prototyping experiment. It's a velocity bet."],
+         ["❓","Question","If your team could go from idea → stakeholder-ready prototype in 2 hours — what changes?"]
+        ].map(([i,l,v])=>`<div style="background:#ffffff08;border:1px solid #ffffff12;border-radius:12px;padding:18px 16px">
+          <div style="font-size:22px;margin-bottom:8px">${i}</div>
+          <div style="color:#FF8C42;font-weight:700;font-size:11px;margin-bottom:6px">${l}</div>
+          <div style="color:#bbb;font-size:12px;line-height:1.6">${v}</div>
+        </div>`).join("")}
+    </div>
+    <div style="background:#FF5C2812;border:1px solid #FF5C2840;border-radius:10px;padding:14px 20px;font-size:14px;color:#FF8C42;font-style:italic">
+      "Is that resonant — or does the bottleneck show up differently for your team?"
+    </div>
+  </div>`;
+}
+
+function slideDiscovery(){
+  return `<div style="background:#0f0f1a;min-height:100%">
+    <div class="label" style="color:#FF5C28">MEDDPICC · SURGICAL</div>
+    <h2>Your World — 7 Minutes, 6 Questions</h2>
+    <div class="sub">Type answers as they speak. These will auto-populate your Recap slide.</div>
+    ${questions.map(q=>`
+    <div style="margin-bottom:18px">
+      <div class="row" style="margin-bottom:4px">
+        <div class="tag-pill" style="background:${q.color}22;border:1px solid ${q.color}55;color:${q.color}">${q.tag}</div>
+        <div style="font-size:13px;color:#ddd;line-height:1.6;padding-top:2px">${q.q}</div>
+      </div>
+      <div style="padding-left:132px">
+        <textarea rows="2" placeholder="${q.ph}" data-key="${q.key}"
+          oninput="answers['${q.key}']=this.value;renderImpact('${q.key}',this.value)"
+        >${answers[q.key]}</textarea>
+        <div id="impact-${q.key}" style="min-height:22px"></div>
+      </div>
+    </div>`).join("")}
+    <div style="display:flex;gap:10px;margin-top:8px">
+      ${["Ask ONE. Listen fully.","Silence is data — sit in it.","Curveball? Get curious, not defensive."].map(t=>`<div style="flex:1;background:#ffffff08;border-radius:8px;padding:9px 12px;font-size:11px;color:#666;text-align:center">${t}</div>`).join("")}
+    </div>
+  </div>`;
+}
+
+function renderImpact(key, val){
+  const el = document.getElementById('impact-'+key);
+  if(!el) return;
+  if(!val.trim()){el.innerHTML='';return;}
+  const impacts = {
+    pain: v => v.length>10 ? `<span class="impact-badge">🎯 Core pain confirmed — use in recap & follow-up framing</span>` : '',
+    metrics: v => v.length>10 ? `<span class="impact-badge">📊 Quantifiable cost captured — anchor your ROI story here</span>` : '',
+    design: v => v.length>10 ? `<span class="impact-badge">🎨 Champion signal — Maria feels the handoff pain directly</span>` : '',
+    buyer: v => /cfo|cto|board|sign/i.test(v) ? `<span class="impact-badge">⚠️ Multi-stakeholder deal — map the full buying committee</span>` : v.length>5 ? `<span class="impact-badge">✅ Single buyer — faster path to close</span>` : '',
+    process: v => /week|month|review|security|legal/i.test(v) ? `<span class="impact-badge">⏱ Long cycle flagged — start procurement conversation early</span>` : v.length>5 ? `<span class="impact-badge">✅ Process noted — factor into next steps timing</span>` : '',
+    scale: v => /2400|all|broad|org|roll/i.test(v) ? `<span class="impact-badge">🚀 Land & expand confirmed — 2,400 seat opportunity</span>` : v.length>5 ? `<span class="impact-badge">📌 Pilot scope noted — define expansion trigger in next session</span>` : '',
+  };
+  el.innerHTML = (impacts[key]||(() => ''))(val);
+}
+
+function slideBeforeAfter(){
+  const rows=[
+    ["Idea → Prototype","1–2 weeks","2–4 hours"],
+    ["Who builds","Engineering dependent","PM / Designer autonomous"],
+    ["Stakeholder review","Static Figma link","Live, clickable shared URL"],
+    ["Revision cycle","Days per round","Minutes per round"],
+    ["Regulatory context","Added post-build","Built into prompt from day 1"],
+    ["Cost per prototype","Engineering sprint cost","Included in seat license"],
+    ["Shareability","Export / screen share only","Link — works globally, no install"],
+    ["Design → Dev handoff","High translation loss","Code export — zero loss"],
+  ];
+  return `<div style="background:#0f0f1a;min-height:100%">
+    <div class="label" style="color:#FF5C28">THE SHIFT</div>
+    <h2>Before Lovable vs. After Lovable</h2>
+    <div class="sub" style="margin-bottom:16px">315 Product FTE × current cycle time = quantifiable velocity cost across 5 concurrent product lines</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1">
+      <div style="background:#1a0f0f;border:1.5px solid #ff444422;border-radius:16px;padding:20px 24px">
+        <div style="color:#ff6b6b;font-weight:700;font-size:12px;margin-bottom:14px;letter-spacing:1px">&#x26D4; BEFORE — TODAY'S STACK</div>
+        ${rows.map(function(r){return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ffffff08;font-size:13px"><span style="color:#888">'+r[0]+'</span><span style="color:#ff8888;font-weight:600">'+r[1]+'</span></div>';}).join("")}
+      </div>
+      <div style="background:#0f1a0f;border:1.5px solid #44ff8822;border-radius:16px;padding:20px 24px">
+        <div style="color:#69db7c;font-weight:700;font-size:12px;margin-bottom:14px;letter-spacing:1px">&#x2705; AFTER — WITH LOVABLE</div>
+        ${rows.map(function(r){return '<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ffffff08;font-size:13px"><span style="color:#888">'+r[0]+'</span><span style="color:#69db7c;font-weight:600">'+r[2]+'</span></div>';}).join("")}
+      </div>
+    </div>
+  </div>`;
+}
+
+function slideArch(){
+  const nodes=[
+    {l:"INPUT",items:["Natural language prompt","Image / screenshot","Figma import","Voice (emerging)"],c:"#b197fc"},
+    null,
+    {l:"INTENT PARSING",items:["Interprets UI element","Understands project context","Maintains full project state"],c:"#74c0fc"},
+    null,
+    {l:"LLM LAYER",items:["Claude (Anthropic) core","React + Tailwind gen","Supabase-compatible"],c:"#FF8C42"},
+    null,
+    {l:"RENDER ENGINE",items:["Instant live preview","Real-time compilation","Click-through interactions"],c:"#69db7c"},
+    null,
+    {l:"OUTPUT",items:["Shareable URL","Code export","Deploy instantly","Iterate in context"],c:"#FF5C28"},
+  ];
+  return `<div style="background:#0f0f1a;min-height:100%;display:flex;flex-direction:column">
+    <div class="label" style="color:#FF5C28">HOW LOVABLE WORKS</div>
+    <h2>Input → Output Architecture</h2>
+    <div class="sub">What happens from prompt to working, shareable app</div>
+    <div style="display:flex;align-items:stretch;justify-content:space-between;gap:4px;flex:1;min-height:220px">
+      ${nodes.map((n,i)=>n===null
+        ? `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex-shrink:0"><div style="width:20px;height:2px;background:#333"></div><div style="width:0;height:0;border-top:4px solid transparent;border-bottom:4px solid transparent;border-left:7px solid #444"></div></div>`
+        : `<div style="flex:1;background:${n.c}15;border:1.5px solid ${n.c}44;border-radius:14px;padding:14px 12px;display:flex;flex-direction:column;gap:6px">
+            <div style="color:${n.c};font-weight:700;font-size:10px;letter-spacing:1px;margin-bottom:4px">${n.l}</div>
+            ${n.items.map(it=>`<div style="font-size:11px;color:#ccc;background:#ffffff08;border-radius:6px;padding:5px 7px;line-height:1.4">${it}</div>`).join("")}
+           </div>`
+      ).join("")}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px">
+      ${[["🔒","Enterprise Security","SOC 2 · No on-prem required · VPC options"],
+         ["🔄","Iterative Loop","Each prompt is context-aware — edits are additive, not destructive"],
+         ["🌍","Global Ready","Shareable links work across distributed teams — no install"]
+        ].map(([i,l,v])=>`<div style="background:#ffffff08;border:1px solid #ffffff10;border-radius:10px;padding:12px 14px;font-size:12px">
+          <span style="margin-right:6px">${i}</span><span style="color:#FF8C42;font-weight:700">${l}: </span><span style="color:#aaa">${v}</span>
+        </div>`).join("")}
+    </div>
+  </div>`;
+}
+
+function slideCompare(){
+  const features=["Natural language → working app","No engineering dependency","Live shareable URL","Code export (React/Tailwind)","Supabase backend integration","Real-time collaboration","Enterprise SSO / SOC 2","Regulatory context prompting","Anthropic/Claude native","Figma import","Land & expand seat model"];
+  const tools=[
+    {n:"Lovable",c:"#FF5C28",v:[1,1,1,1,1,0,1,1,1,1,1]},
+    {n:"Figma",  c:"#A259FF",v:[0,1,1,0,0,1,1,0,0,1,1]},
+    {n:"Claude.ai",c:"#CC785C",v:[0,1,0,0,0,0,0,0,1,0,0]},
+    {n:"Cursor", c:"#4dabf7",v:[0,0,0,1,1,0,0,0,1,0,0]},
+    {n:"v0",     c:"#aaa",   v:[1,1,0,1,0,0,0,0,0,0,0]},
+    {n:"Bolt",   c:"#FACC15",v:[1,1,0,1,1,0,0,0,0,0,0]},
+  ];
+  return `<div style="background:#0f0f1a;min-height:100%;display:flex;flex-direction:column">
+    <div class="label" style="color:#FF5C28">ENTERPRISE FEATURE COMPARISON</div>
+    <h2>Lovable vs. Stack & Competitors</h2>
+    <div class="sub">Pull this slide if they mention Figma, Cursor, v0, or Bolt.</div>
+    <div style="overflow-x:auto;flex:1">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead><tr>
+          <th style="text-align:left;padding:8px 10px;color:#555;border-bottom:1px solid #222;min-width:200px">Feature</th>
+          ${tools.map(t=>`<th style="padding:8px 12px;border-bottom:1px solid #222;color:${t.c};font-weight:700;font-size:12px;text-align:center;min-width:76px">${t.n==="Lovable"?`<span style="background:#FF5C2822;border:1px solid #FF5C2855;border-radius:6px;padding:3px 8px">${t.n}</span>`:t.n}</th>`).join("")}
+        </tr></thead>
+        <tbody>
+          ${features.map((f,i)=>`<tr style="background:${i%2===0?"#ffffff04":"transparent"}">
+            <td style="padding:9px 10px;color:#ccc;border-bottom:1px solid #1a1a1a">${f}</td>
+            ${tools.map(t=>`<td style="text-align:center;padding:9px 12px;border-bottom:1px solid #1a1a1a">${t.v[i]?'<span style="color:#69db7c;font-size:15px">✓</span>':'<span style="color:#2a2a2a;font-size:13px">–</span>'}</td>`).join("")}
+          </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:14px;background:#74c0fc12;border:1px solid #74c0fc30;border-radius:10px;padding:10px 18px;font-size:12px;color:#74c0fc">
+      💡 Revolut already uses Claude — Lovable runs on Anthropic's stack. There may be a procurement path via your existing Anthropic enterprise agreement that bypasses a full vendor evaluation.
+    </div>
+  </div>`;
+}
+
+function slideRecap(){
+  const labels={
+    pain:   {label:"The Problem",    color:"#FF5C28", fallback:"[ Playback their core friction — prototype speed / engineering dependency / decision latency ]"},
+    metrics:{label:"What's at Stake",color:"#FF8C42", fallback:"[ The business cost Dmitry named — sprint velocity, concurrent launches, market speed ]"},
+    design: {label:"Champion Signal",color:"#FFB347", fallback:"[ What Maria said about design intent surviving the handoff ]"},
+    buyer:  {label:"Decision Path",  color:"#66d9e8", fallback:"[ Who else needs to be involved — CTO / CFO / procurement ]"},
+    process:{label:"Vendor Process", color:"#74c0fc", fallback:"[ Timeline for security review, legal, procurement ]"},
+    scale:  {label:"Scale Ambition", color:"#b197fc", fallback:"[ 150 pilot or 2,400 PDE org — what's the expansion intent ]"},
+  };
+  return `<div style="background:#0f0f1a;min-height:100%;display:flex;flex-direction:column">
+    <div class="label" style="color:#FF5C28">LET ME MAKE SURE I GOT THIS RIGHT</div>
+    <h2>What I Heard</h2>
+    <div class="sub">Stop me if I've missed anything or got something wrong.</div>
+    <div style="display:flex;flex-direction:column;gap:12px;flex:1">
+      ${Object.entries(labels).map(([key,{label,color,fallback}])=>{
+        const val = answers[key];
+        return `<div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="min-width:130px;color:${color};font-weight:700;font-size:11px;padding-top:4px;text-transform:uppercase;letter-spacing:.5px">${label}</div>
+          <div style="flex:1;background:${val?color+'15':'#ffffff08'};border:1px solid ${val?color+'44':'#ffffff10'};border-radius:8px;padding:10px 16px;font-size:13px;color:${val?'#e0e0e0':'#555'};font-style:${val?'normal':'italic'};line-height:1.5">
+            ${val || fallback}
+          </div>
+        </div>`;
+      }).join("")}
+    </div>
+    <div style="margin-top:16px;background:#69db7c12;border:1px solid #69db7c30;border-radius:10px;padding:12px 20px;font-size:13px;color:#69db7c;font-style:italic">
+      "Does that capture it — or is there something I've misunderstood?"
+    </div>
+  </div>`;
+}
+
+function slideNextSteps(){
+  return `<div style="background:#0f0f1a;min-height:100%;display:flex;flex-direction:column">
+    <div class="label" style="color:#FF5C28">CLOSING THE LOOP</div>
+    <h2>What Happens Next</h2>
+    <div class="sub">I'll confirm this in writing within 90 minutes of our call ending.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1">
+      <div>
+        <div style="color:#888;font-weight:700;font-size:11px;letter-spacing:1px;margin-bottom:14px">FOLLOW-UP EMAIL INCLUDES</div>
+        ${[["📋","Recap","Everything you told me, reflected back clearly"],
+           ["❓","Why Anything","The cost of your current cycle — quantified"],
+           ["💜","Why Lovable","What makes this different from your existing stack"],
+           ["⏱","Why Now","Concurrent launches + velocity window"],
+           ["🖼","Before / After Visual","One-page PDF — shareable internally"],
+           ["🔗","The Prototype","Link to what I showed you today — yours to keep"],
+          ].map(([i,t,s])=>`<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:14px">
+            <span style="font-size:16px">${i}</span>
+            <div><div style="font-weight:600;font-size:13px;color:#ddd">${t}</div><div style="font-size:12px;color:#666">${s}</div></div>
+          </div>`).join("")}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="color:#888;font-weight:700;font-size:11px;letter-spacing:1px;margin-bottom:0">PROPOSED NEXT SESSION</div>
+        <div style="background:#FF5C2812;border:1.5px solid #FF5C2840;border-radius:14px;padding:20px 22px;flex:1">
+          <div style="font-size:14px;font-weight:700;margin-bottom:10px;color:#FF8C42">Working Session</div>
+          <div style="color:#ccc;font-size:13px;line-height:1.9">
+            • Bring 3–4 PMs + designers<br>
+            • Take something real from your backlog<br>
+            • Build it live — together<br>
+            • Your team feels the workflow firsthand<br>
+            • Agree on pilot scope by end of session
+          </div>
+          <div style="margin-top:14px;background:#FF5C2820;border-radius:8px;padding:10px 14px;font-size:12px;color:#FF8C42;font-weight:600;font-style:italic">
+            "What would make that session worth your team's time?"
+          </div>
+        </div>
+        <div style="background:#ffffff08;border:1px solid #ffffff10;border-radius:10px;padding:14px 18px;font-size:13px;color:#aaa">
+          <span style="color:#74c0fc;font-weight:700">Before we close: </span>
+          Is there anything else you'd need from me before your next internal conversation about this?
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── slide registry ───────────────────────────────────────
+const slides=[
+  {id:"intro",     label:"Intro",        render:slideIntro},
+  {id:"agenda",    label:"Agenda",       render:slideAgenda},
+  {id:"hypothesis",label:"Hypothesis",   render:slideHypothesis},
+  {id:"discovery", label:"Discovery ✍", render:slideDiscovery},
+  {id:"beforeafter",label:"Before/After",render:slideBeforeAfter},
+  {id:"arch",      label:"Architecture", render:slideArch},
+  {id:"compare",   label:"Compare",      render:slideCompare},
+  {id:"recap",     label:"Recap",        render:slideRecap},
+  {id:"nextsteps", label:"Next Steps",   render:slideNextSteps},
+];
+
+let current=0;
+
+function render(){
+  // nav
+  const nav=document.getElementById('nav');
+  nav.innerHTML=slides.map((s,i)=>`<button class="nav-btn ${i===current?'active':''}" onclick="go(${i})">${s.label}</button>`).join('')
+    +`<div class="pager">
+        <button class="pg-btn" onclick="go(${current-1})" ${current===0?'disabled':''}>← Prev</button>
+        <span class="pg-label">${current+1}/${slides.length}</span>
+        <button class="pg-btn" onclick="go(${current+1})" ${current===slides.length-1?'disabled':''}>Next →</button>
+      </div>`;
+  // stage
+  const stage=document.getElementById('stage');
+  stage.innerHTML=`<div class="slide active" style="background:#0f0f1a">${slides[current].render()}</div>`;
+  // re-bind textarea values after re-render
+  if(slides[current].id==='discovery'){
+    questions.forEach(q=>{
+      const ta=stage.querySelector(`textarea[data-key="${q.key}"]`);
+      if(ta){ ta.value=answers[q.key]; renderImpact(q.key,answers[q.key]); }
+    });
+  }
+}
+
+function go(i){
+  if(i<0||i>=slides.length) return;
+  // save textarea values before leaving discovery
+  if(slides[current].id==='discovery'){
+    questions.forEach(q=>{
+      const ta=document.querySelector(`textarea[data-key="${q.key}"]`);
+      if(ta) answers[q.key]=ta.value;
+    });
+  }
+  current=i; render();
+}
+
+render();
+</script>
+</body>
+</html>
