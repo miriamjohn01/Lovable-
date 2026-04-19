@@ -1,0 +1,414 @@
+import { useState } from "react";
+
+const slides = [
+  // 0 - INTRO
+  {
+    id: "intro",
+    label: "Intro",
+    render: () => (
+      <div className="flex flex-col items-center justify-center h-full text-white" style={{background: "linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #0d1b2a 100%)"}}>
+        <div className="mb-6 flex items-center gap-4">
+          <div style={{background:"#FF5C28", borderRadius:12, padding:"10px 22px", fontWeight:900, fontSize:22, letterSpacing:1}}>Lovable</div>
+          <div style={{color:"#555", fontSize:28}}>×</div>
+          <div style={{background:"#191C1F", border:"1.5px solid #333", borderRadius:12, padding:"10px 22px", fontWeight:900, fontSize:22, color:"#fff", letterSpacing:1}}>Revolut</div>
+        </div>
+        <h1 style={{fontSize:36, fontWeight:800, marginBottom:8, textAlign:"center"}}>Building at the Speed<br/>of Decision</h1>
+        <p style={{color:"#aaa", fontSize:16, marginBottom:40, textAlign:"center"}}>A conversation about what's possible when product teams<br/>stop waiting for engineering.</p>
+        <div style={{display:"flex", gap:32, marginTop:8}}>
+          {["Dmitry Zokalov — CPO","Maria Herrera — Head of Product Design"].map(n => (
+            <div key={n} style={{background:"#ffffff0f", border:"1px solid #ffffff18", borderRadius:10, padding:"10px 22px", fontSize:13, color:"#ccc"}}>{n}</div>
+          ))}
+        </div>
+        <div style={{position:"absolute", bottom:28, color:"#444", fontSize:12}}>30 minutes · Inbound Discovery · Confidential</div>
+      </div>
+    )
+  },
+  // 1 - AGENDA
+  {
+    id: "agenda",
+    label: "Agenda",
+    render: () => (
+      <div className="flex flex-col h-full text-white" style={{background:"#0f0f1a", padding:"48px 60px"}}>
+        <div style={{color:"#FF5C28", fontWeight:700, fontSize:13, letterSpacing:2, marginBottom:8}}>OUR 30 MINUTES TOGETHER</div>
+        <h2 style={{fontSize:30, fontWeight:800, marginBottom:36}}>What to Expect</h2>
+        {[
+          {time:"0–2 min", title:"Introductions", desc:"Context on each side — what brought you here, what we've prepared specifically for Revolut.", color:"#FF5C28"},
+          {time:"2–4 min", title:"One Observation", desc:"A hypothesis on where the real bottleneck lives for a product org at your scale. Tell me if I'm wrong.", color:"#FF8C42"},
+          {time:"4–11 min", title:"Your World", desc:"Focused questions — I want to understand the friction, not assume it. No boilerplate discovery.", color:"#FFB347"},
+          {time:"11–14 min", title:"Something Built", desc:"I'll show you what I built this morning specific to Revolut. Optionally, we build something live.", color:"#66d9e8"},
+          {time:"14–16 min", title:"Honest Fit Conversation", desc:"Why anything, why Lovable, why now — and whether this is worth a deeper session.", color:"#74c0fc"},
+        ].map((s,i) => (
+          <div key={i} style={{display:"flex", gap:20, marginBottom:18, alignItems:"flex-start"}}>
+            <div style={{minWidth:70, color:s.color, fontWeight:700, fontSize:13, paddingTop:2}}>{s.time}</div>
+            <div style={{width:3, background:s.color, borderRadius:3, minHeight:40, marginTop:2}}/>
+            <div>
+              <div style={{fontWeight:700, fontSize:15, marginBottom:3}}>{s.title}</div>
+              <div style={{color:"#999", fontSize:13}}>{s.desc}</div>
+            </div>
+          </div>
+        ))}
+        <div style={{marginTop:"auto", background:"#ffffff0a", borderRadius:10, padding:"12px 20px", fontSize:13, color:"#aaa", border:"1px solid #ffffff12"}}>
+          Goal: You leave this call knowing whether Lovable can fundamentally change how your product team moves.
+        </div>
+      </div>
+    )
+  },
+  // 2 - HYPOTHESIS
+  {
+    id: "hypothesis",
+    label: "Hypothesis",
+    render: () => (
+      <div className="flex flex-col h-full text-white" style={{background:"#0f0f1a", padding:"48px 60px"}}>
+        <div style={{color:"#FF5C28", fontWeight:700, fontSize:13, letterSpacing:2, marginBottom:8}}>PRESSURE TEST THIS</div>
+        <h2 style={{fontSize:30, fontWeight:800, marginBottom:10}}>My Hypothesis on Revolut's Real Problem</h2>
+        <p style={{color:"#888", fontSize:14, marginBottom:32}}>Tell me where I'm wrong — that's more valuable than agreeing.</p>
+
+        <div style={{background:"linear-gradient(135deg,#1e1e2e,#252538)", border:"1.5px solid #FF5C2840", borderRadius:16, padding:"28px 32px", marginBottom:24}}>
+          <div style={{color:"#FF5C28", fontWeight:700, marginBottom:10, fontSize:14}}>THE HYPOTHESIS</div>
+          <p style={{fontSize:17, lineHeight:1.7, color:"#e0e0e0"}}>
+            Revolut's product org has solved the <em>tooling</em> problem — Figma for design, Claude for intelligence, strong in-house engineering. 
+            What it hasn't solved is <strong style={{color:"#FF8C42"}}>decision latency</strong> — the gap between "we have an idea" and "a stakeholder can react to something real."
+          </p>
+          <p style={{fontSize:17, lineHeight:1.7, color:"#e0e0e0", marginTop:12}}>
+            Across 5 concurrent product lines, 30+ markets, and a race to 100M customers — that gap compounds. Fast.
+          </p>
+        </div>
+
+        <div style={{display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:14}}>
+          {[
+            {label:"Evidence", val:"Hiring slowed in 2024 despite record growth. AI cited as reason — fewer people must move faster.", icon:"📊"},
+            {label:"Signal", val:"150 users, 6–12mo timeline. This isn't a prototyping experiment. It's a velocity bet.", icon:"📡"},
+            {label:"Question", val:"If your team could go from idea → stakeholder-ready prototype in 2 hours — what changes?", icon:"❓"},
+          ].map((c,i) => (
+            <div key={i} style={{background:"#ffffff08", border:"1px solid #ffffff12", borderRadius:12, padding:"18px 16px"}}>
+              <div style={{fontSize:22, marginBottom:8}}>{c.icon}</div>
+              <div style={{color:"#FF8C42", fontWeight:700, fontSize:12, marginBottom:6}}>{c.label}</div>
+              <div style={{color:"#bbb", fontSize:13, lineHeight:1.6}}>{c.val}</div>
+            </div>
+          ))}
+        </div>
+
+        <div style={{marginTop:24, background:"#FF5C2812", border:"1px solid #FF5C2840", borderRadius:10, padding:"14px 20px", fontSize:14, color:"#FF8C42", fontStyle:"italic"}}>
+          "Is that resonant — or does the bottleneck show up differently for your team?"
+        </div>
+      </div>
+    )
+  },
+  // 3 - DISCOVERY QUESTIONS
+  {
+    id: "discovery",
+    label: "Discovery",
+    render: () => (
+      <div className="flex flex-col h-full text-white" style={{background:"#0f0f1a", padding:"48px 60px"}}>
+        <div style={{color:"#FF5C28", fontWeight:700, fontSize:13, letterSpacing:2, marginBottom:8}}>MEDDPICC · SURGICAL</div>
+        <h2 style={{fontSize:28, fontWeight:800, marginBottom:28}}>Your World — 7 Minutes, 6 Questions</h2>
+        <div style={{display:"flex", flexDirection:"column", gap:14}}>
+          {[
+            {tag:"PAIN", color:"#FF5C28", q:"When you say 'prototype faster' — is the friction the time, the engineering dependency, or what survives the handoff to dev?"},
+            {tag:"METRICS", color:"#FF8C42", q:"Across mortgages, AI assistant, Revolut X, ATMs — what does a 2-week prototype delay actually cost at your scale?"},
+            {tag:"DESIGN", color:"#FFB347", q:"Maria — how much of the original intent survives when design hands off to engineering today?"},
+            {tag:"ECONOMIC BUYER", color:"#66d9e8", q:"Is this a CPO-level call, or does tooling at this scope involve your CTO or CFO?"},
+            {tag:"PROCESS", color:"#74c0fc", q:"How does a net-new vendor evaluation move at Revolut — given your regulatory environment?"},
+            {tag:"SCALE", color:"#b197fc", q:"150 users — is that one division piloting, or a proof point for the broader PDE org of 2,400+?"},
+          ].map((q,i) => (
+            <div key={i} style={{display:"flex", gap:14, alignItems:"flex-start"}}>
+              <div style={{minWidth:110, background:q.color+"22", border:`1px solid ${q.color}55`, borderRadius:6, padding:"3px 8px", fontSize:10, fontWeight:700, color:q.color, textAlign:"center", marginTop:3}}>{q.tag}</div>
+              <div style={{fontSize:14, color:"#ddd", lineHeight:1.6}}>{q.q}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{marginTop:"auto", display:"flex", gap:10}}>
+          {["Ask ONE. Listen fully. Don't move until they finish.", "Silence is data. Sit in it.", "If they go off-script → get curious, not defensive."].map((t,i) => (
+            <div key={i} style={{flex:1, background:"#ffffff08", borderRadius:8, padding:"10px 14px", fontSize:12, color:"#888", textAlign:"center"}}>{t}</div>
+          ))}
+        </div>
+      </div>
+    )
+  },
+  // 4 - BEFORE / AFTER
+  {
+    id: "beforeafter",
+    label: "Before / After",
+    render: () => (
+      <div className="flex flex-col h-full text-white" style={{background:"#0f0f1a", padding:"40px 50px"}}>
+        <div style={{color:"#FF5C28", fontWeight:700, fontSize:13, letterSpacing:2, marginBottom:8}}>THE SHIFT</div>
+        <h2 style={{fontSize:28, fontWeight:800, marginBottom:28}}>Before Lovable vs. After Lovable</h2>
+        <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:20, flex:1}}>
+          {/* Before */}
+          <div style={{background:"#1a0f0f", border:"1.5px solid #ff444422", borderRadius:16, padding:"24px 28px"}}>
+            <div style={{color:"#ff6b6b", fontWeight:700, fontSize:13, marginBottom:18, letterSpacing:1}}>BEFORE — TODAY'S STACK</div>
+            {[
+              ["Idea → Prototype","1–2 weeks"],
+              ["Who builds","Engineering dependent"],
+              ["Stakeholder review","Static Figma link"],
+              ["Revision cycle","Days per round"],
+              ["Regulatory context","Added post-build"],
+              ["Cost per prototype","Engineering sprint"],
+              ["Shareability","Export / screen share only"],
+              ["Design → Dev handoff","High translation loss"],
+            ].map(([k,v],i) => (
+              <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"8px 0", borderBottom:"1px solid #ffffff0a", fontSize:13}}>
+                <span style={{color:"#aaa"}}>{k}</span>
+                <span style={{color:"#ff8888", fontWeight:600}}>{v}</span>
+              </div>
+            ))}
+          </div>
+          {/* After */}
+          <div style={{background:"#0f1a0f", border:"1.5px solid #44ff8822", borderRadius:16, padding:"24px 28px"}}>
+            <div style={{color:"#69db7c", fontWeight:700, fontSize:13, marginBottom:18, letterSpacing:1}}>AFTER — WITH LOVABLE</div>
+            {[
+              ["Idea → Prototype","2–4 hours"],
+              ["Who builds","PM / Designer autonomous"],
+              ["Stakeholder review","Live, clickable, shared URL"],
+              ["Revision cycle","Minutes per round"],
+              ["Regulatory context","Built into prompt from day 1"],
+              ["Cost per prototype","Included in seat license"],
+              ["Shareability","Link — works globally, no install"],
+              ["Design → Dev handoff","Code export — zero loss"],
+            ].map(([k,v],i) => (
+              <div key={i} style={{display:"flex", justifyContent:"space-between", padding:"8px 0", borderBottom:"1px solid #ffffff0a", fontSize:13}}>
+                <span style={{color:"#aaa"}}>{k}</span>
+                <span style={{color:"#69db7c", fontWeight:600}}>{v}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div style={{marginTop:20, background:"#FF5C2812", border:"1px solid #FF5C2830", borderRadius:10, padding:"14px 24px", fontSize:13, color:"#FF8C42", textAlign:"center"}}>
+          315 Product FTE × current cycle time = quantifiable velocity cost across 5 concurrent product lines
+        </div>
+      </div>
+    )
+  },
+  // 5 - ARCHITECTURE DIAGRAM
+  {
+    id: "architecture",
+    label: "Architecture",
+    render: () => (
+      <div className="flex flex-col h-full text-white" style={{background:"#0f0f1a", padding:"40px 50px"}}>
+        <div style={{color:"#FF5C28", fontWeight:700, fontSize:13, letterSpacing:2, marginBottom:8}}>HOW LOVABLE WORKS</div>
+        <h2 style={{fontSize:26, fontWeight:800, marginBottom:6}}>Input → Output Architecture</h2>
+        <p style={{color:"#777", fontSize:13, marginBottom:28}}>What happens from the moment a prompt is entered to a working, shareable app</p>
+
+        <div style={{display:"flex", alignItems:"center", justifyContent:"space-between", gap:4, flex:1, alignSelf:"stretch"}}>
+          {[
+            {label:"INPUT", items:["Natural language prompt","Image / screenshot","Figma import","Voice (emerging)"], color:"#b197fc", bg:"#b197fc15"},
+            null,
+            {label:"INTENT PARSING", items:["Interprets UI element requested","Understands project context","Maintains full project state"], color:"#74c0fc", bg:"#74c0fc15"},
+            null,
+            {label:"LLM LAYER", items:["Claude (Anthropic) core","React + Tailwind generation","Supabase-compatible backend"], color:"#FF8C42", bg:"#FF8C4215"},
+            null,
+            {label:"RENDER ENGINE", items:["Instant live preview","Real-time compilation","Click-through interactions"], color:"#69db7c", bg:"#69db7c15"},
+            null,
+            {label:"OUTPUT", items:["Shareable URL","Code export","Deploy instantly","Iterate in context"], color:"#FF5C28", bg:"#FF5C2815"},
+          ].map((node, i) => {
+            if (!node) return (
+              <div key={i} style={{display:"flex", flexDirection:"column", alignItems:"center", gap:3}}>
+                <div style={{width:24, height:2, background:"#444"}}/>
+                <div style={{width:0, height:0, borderTop:"5px solid transparent", borderBottom:"5px solid transparent", borderLeft:"8px solid #444"}}/>
+              </div>
+            );
+            return (
+              <div key={i} style={{flex:1, background:node.bg, border:`1.5px solid ${node.color}44`, borderRadius:14, padding:"16px 14px", display:"flex", flexDirection:"column", gap:6, alignSelf:"stretch", justifyContent:"flex-start"}}>
+                <div style={{color:node.color, fontWeight:700, fontSize:11, letterSpacing:1, marginBottom:4}}>{node.label}</div>
+                {node.items.map((item,j) => (
+                  <div key={j} style={{fontSize:12, color:"#ccc", background:"#ffffff08", borderRadius:6, padding:"5px 8px", lineHeight:1.4}}>{item}</div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{marginTop:20, display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:12}}>
+          {[
+            {icon:"🔒", label:"Enterprise Security", val:"SOC 2 · No on-prem required · VPC options"},
+            {icon:"🔄", label:"Iterative Loop", val:"Each prompt is context-aware — edits are additive, not destructive"},
+            {icon:"🌍", label:"Global Ready", val:"Shareable links work across distributed teams — no install"},
+          ].map((c,i) => (
+            <div key={i} style={{background:"#ffffff08", border:"1px solid #ffffff10", borderRadius:10, padding:"12px 16px", fontSize:12}}>
+              <span style={{marginRight:8}}>{c.icon}</span>
+              <span style={{color:"#FF8C42", fontWeight:700}}>{c.label}: </span>
+              <span style={{color:"#aaa"}}>{c.val}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  },
+  // 6 - STACK COMPARE
+  {
+    id: "stackcompare",
+    label: "Stack Compare",
+    render: () => {
+      const features = [
+        "Natural language → working app",
+        "No engineering dependency",
+        "Live shareable URL",
+        "Code export (React/Tailwind)",
+        "Supabase backend integration",
+        "Real-time collaboration",
+        "Enterprise SSO / SOC2",
+        "Regulatory context prompting",
+        "Anthropic/Claude native",
+        "Figma import",
+        "Land & expand seat model",
+      ];
+      const tools = [
+        {name:"Lovable", color:"#FF5C28", vals:[1,1,1,1,1,0,1,1,1,1,1]},
+        {name:"Figma", color:"#A259FF", vals:[0,1,1,0,0,1,1,0,0,1,1]},
+        {name:"Claude.ai", color:"#CC785C", vals:[0,1,0,0,0,0,0,0,1,0,0]},
+        {name:"Cursor", color:"#4dabf7", vals:[0,0,0,1,1,0,0,0,1,0,0]},
+        {name:"v0 (Vercel)", color:"#aaa", vals:[1,1,0,1,0,0,0,0,0,0,0]},
+        {name:"Bolt.new", color:"#FACC15", vals:[1,1,0,1,1,0,0,0,0,0,0]},
+      ];
+      return (
+        <div className="flex flex-col h-full text-white" style={{background:"#0f0f1a", padding:"36px 44px"}}>
+          <div style={{color:"#FF5C28", fontWeight:700, fontSize:12, letterSpacing:2, marginBottom:6}}>ENTERPRISE FEATURE COMPARISON</div>
+          <h2 style={{fontSize:24, fontWeight:800, marginBottom:20}}>Lovable vs. Current Stack & Competitors</h2>
+          <div style={{overflowX:"auto", flex:1}}>
+            <table style={{width:"100%", borderCollapse:"collapse", fontSize:12}}>
+              <thead>
+                <tr>
+                  <th style={{textAlign:"left", padding:"8px 10px", color:"#666", borderBottom:"1px solid #222", minWidth:200}}>Feature</th>
+                  {tools.map(t => (
+                    <th key={t.name} style={{padding:"8px 12px", borderBottom:"1px solid #222", color:t.color, fontWeight:700, fontSize:12, textAlign:"center", minWidth:80}}>
+                      {t.name === "Lovable" ? <span style={{background:"#FF5C2822", border:"1px solid #FF5C2855", borderRadius:6, padding:"3px 10px"}}>{t.name}</span> : t.name}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {features.map((f,i) => (
+                  <tr key={i} style={{background: i%2===0 ? "#ffffff04" : "transparent"}}>
+                    <td style={{padding:"9px 10px", color:"#ccc", borderBottom:"1px solid #1a1a1a"}}>{f}</td>
+                    {tools.map(t => (
+                      <td key={t.name} style={{textAlign:"center", padding:"9px 12px", borderBottom:"1px solid #1a1a1a"}}>
+                        {t.vals[i] ? <span style={{color:"#69db7c", fontSize:16}}>✓</span> : <span style={{color:"#333", fontSize:14}}>–</span>}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div style={{marginTop:14, background:"#74c0fc12", border:"1px solid #74c0fc30", borderRadius:10, padding:"10px 18px", fontSize:12, color:"#74c0fc"}}>
+            💡 Revolut already uses Claude — Lovable runs on Anthropic's stack. There may be a procurement path via your existing Anthropic enterprise agreement.
+          </div>
+        </div>
+      );
+    }
+  },
+  // 7 - RECAP SLIDE
+  {
+    id: "recap",
+    label: "Recap",
+    render: () => (
+      <div className="flex flex-col h-full text-white" style={{background:"#0f0f1a", padding:"48px 60px"}}>
+        <div style={{color:"#FF5C28", fontWeight:700, fontSize:13, letterSpacing:2, marginBottom:8}}>LET ME MAKE SURE I GOT THIS RIGHT</div>
+        <h2 style={{fontSize:28, fontWeight:800, marginBottom:10}}>What I Heard</h2>
+        <p style={{color:"#777", fontSize:13, marginBottom:28}}>Stop me if I've missed anything or got something wrong.</p>
+        <div style={{display:"flex", flexDirection:"column", gap:14, flex:1}}>
+          {[
+            {label:"The Problem", placeholder:"[ Playback their stated pain — prototype speed / engineering dependency / decision latency ]", color:"#FF5C28"},
+            {label:"The Scale", placeholder:"150 end users · 6–12 month timeline · [ confirm whether pilot or broader rollout ]", color:"#FF8C42"},
+            {label:"What's at Stake", placeholder:"[ Playback the business impact Dmitry named — sprint velocity, market speed, concurrent launches ]", color:"#FFB347"},
+            {label:"What They've Tried", placeholder:"Figma + Claude + In-house tools · [ gaps they named in current stack ]", color:"#66d9e8"},
+            {label:"Decision Path", placeholder:"[ Who else needs to be involved · procurement · security review timeline ]", color:"#74c0fc"},
+            {label:"What Success Looks Like", placeholder:"[ Playback their definition — not yours ]", color:"#b197fc"},
+          ].map((r,i) => (
+            <div key={i} style={{display:"flex", gap:16, alignItems:"flex-start"}}>
+              <div style={{minWidth:140, color:r.color, fontWeight:700, fontSize:12, paddingTop:3}}>{r.label}</div>
+              <div style={{flex:1, background:"#ffffff08", border:"1px solid #ffffff10", borderRadius:8, padding:"10px 16px", fontSize:13, color:"#999", fontStyle:"italic"}}>{r.placeholder}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{marginTop:20, background:"#69db7c12", border:"1px solid #69db7c30", borderRadius:10, padding:"12px 20px", fontSize:13, color:"#69db7c"}}>
+          "Does that capture it — or is there something I've misunderstood?"
+        </div>
+      </div>
+    )
+  },
+  // 8 - NEXT STEPS
+  {
+    id: "nextsteps",
+    label: "Next Steps",
+    render: () => (
+      <div className="flex flex-col h-full text-white" style={{background:"0f0f1a", padding:"48px 60px", background:"#0f0f1a"}}>
+        <div style={{color:"#FF5C28", fontWeight:700, fontSize:13, letterSpacing:2, marginBottom:8}}>CLOSING THE LOOP</div>
+        <h2 style={{fontSize:28, fontWeight:800, marginBottom:8}}>What Happens Next</h2>
+        <p style={{color:"#777", fontSize:13, marginBottom:32}}>I'll confirm this in writing within 90 minutes of our call ending.</p>
+        <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:20, flex:1}}>
+          <div style={{display:"flex", flexDirection:"column", gap:14}}>
+            <div style={{color:"#aaa", fontWeight:700, fontSize:12, letterSpacing:1, marginBottom:4}}>FOLLOW-UP EMAIL INCLUDES</div>
+            {[
+              ["📋","Recap of what we covered","Everything you told me, reflected back clearly"],
+              ["❓","Why Anything","The cost of your current cycle — quantified"],
+              ["💜","Why Lovable","What makes this different from your existing stack"],
+              ["⏱","Why Now","The velocity window — concurrent launches, 2025–2026"],
+              ["🖼","Before / After Visual","One-page PDF — shareable internally"],
+              ["🔗","The Prototype I Built","Link to what I showed you today"],
+            ].map(([icon,title,sub],i) => (
+              <div key={i} style={{display:"flex", gap:12, alignItems:"flex-start"}}>
+                <span style={{fontSize:16, marginTop:2}}>{icon}</span>
+                <div>
+                  <div style={{fontWeight:600, fontSize:13, color:"#ddd"}}>{title}</div>
+                  <div style={{fontSize:12, color:"#777"}}>{sub}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{display:"flex", flexDirection:"column", gap:14}}>
+            <div style={{color:"#aaa", fontWeight:700, fontSize:12, letterSpacing:1, marginBottom:4}}>PROPOSED NEXT SESSION</div>
+            <div style={{background:"#FF5C2812", border:"1.5px solid #FF5C2840", borderRadius:14, padding:"22px 24px", flex:1}}>
+              <div style={{fontSize:15, fontWeight:700, marginBottom:8, color:"#FF8C42"}}>Working Session</div>
+              <div style={{color:"#ccc", fontSize:13, lineHeight:1.8}}>
+                • Bring 3–4 PMs + designers<br/>
+                • Take something real from your backlog<br/>
+                • Build it live — together<br/>
+                • Your team feels the workflow firsthand<br/>
+                • We agree on pilot scope by end of session
+              </div>
+              <div style={{marginTop:16, background:"#FF5C2820", borderRadius:8, padding:"10px 14px", fontSize:12, color:"#FF8C42", fontWeight:600}}>
+                "What would make that session worth your team's time?"
+              </div>
+            </div>
+            <div style={{background:"#ffffff08", border:"1px solid #ffffff10", borderRadius:10, padding:"14px 18px", fontSize:13, color:"#aaa"}}>
+              <span style={{color:"#74c0fc", fontWeight:700}}>Before we close: </span>
+              Is there anything else you'd need from me before your next internal conversation about this?
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+];
+
+export default function Deck() {
+  const [current, setCurrent] = useState(0);
+  const slide = slides[current];
+  return (
+    <div style={{display:"flex", flexDirection:"column", height:"100vh", background:"#080810", fontFamily:"'Inter',sans-serif"}}>
+      {/* Nav */}
+      <div style={{display:"flex", gap:4, padding:"10px 16px", background:"#0a0a14", borderBottom:"1px solid #1a1a2e", overflowX:"auto"}}>
+        {slides.map((s,i) => (
+          <button key={s.id} onClick={() => setCurrent(i)}
+            style={{padding:"5px 14px", borderRadius:6, border:"none", cursor:"pointer", fontSize:12, fontWeight:600, whiteSpace:"nowrap",
+              background: i===current ? "#FF5C28" : "#1a1a2e",
+              color: i===current ? "#fff" : "#666"}}>
+            {s.label}
+          </button>
+        ))}
+        <div style={{marginLeft:"auto", display:"flex", gap:8, alignItems:"center"}}>
+          <button onClick={() => setCurrent(Math.max(0,current-1))} disabled={current===0}
+            style={{padding:"5px 12px", borderRadius:6, border:"1px solid #333", background:"transparent", color: current===0?"#333":"#aaa", cursor:"pointer", fontSize:12}}>← Prev</button>
+          <span style={{color:"#555", fontSize:12}}>{current+1}/{slides.length}</span>
+          <button onClick={() => setCurrent(Math.min(slides.length-1,current+1))} disabled={current===slides.length-1}
+            style={{padding:"5px 12px", borderRadius:6, border:"1px solid #333", background:"transparent", color: current===slides.length-1?"#333":"#aaa", cursor:"pointer", fontSize:12}}>Next →</button>
+        </div>
+      </div>
+      {/* Slide */}
+      <div style={{flex:1, position:"relative", overflow:"hidden"}}>
+        {slide.render()}
+      </div>
+    </div>
+  );
+}
